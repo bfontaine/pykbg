@@ -1,4 +1,8 @@
-# Contributing to Pykbg
+# Contributing to PyKbg
+
+Install dependencies:
+
+    pip3 install -r requirements.txt
 
 ## Run the tests
 
@@ -13,7 +17,7 @@ Ensure you have up-to-date distributing tools:
 Then:
 
 1. Update the Changelog
-2. Bump the version in `buca.py`
+2. Bump the version in `setup.py` and `kbg/__init__.py`
 3. Ensure the tests pass
 4. Commit and tag
 5. `rm -rf dist/*`
