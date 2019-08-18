@@ -14,6 +14,14 @@ BASE_HEADERS = {
     "User-Agent": UA,
 }
 
+def _strip_mongodb_ids(xs):
+    # Some endpoints return lists of MongoDB objects. We probably don't need
+    # the internal ids, so let's strip them.
+    for x in xs:
+        if "_id" in x:
+            del x["_id"]
+    return xs
+
 class UnauthenticatedKbg:
     """
     Simpler version of Kbg that exposes endpoints which don't need a logged-in
@@ -60,14 +68,41 @@ class UnauthenticatedKbg:
 
     def get_store_availabilities(self, store_id):
         """
-        Return a ``dict`` mapping product ids(?) to their availabilities(?) for
-        the current command window(?) in the given store.
+        Return a ``dict`` mapping product ids to their availabilities for
+        the current command window in the given store.
 
         ``store_id`` must be the three-uppercase-letters code of the store. See
         ``get_stores`` for a list.
+
+        See ``get_store_offer`` to get all products and their
+        ``producerproduct_id`` key that you can use in the availability
+        ``dict``.
         """
         resp = self._request_json("/available", params={"locale": store_id})
         return resp["available"]
+
+    def get_store_offer(self, store_id):
+        """
+        Return the current offer in the given store. The returned value is a
+        ``dict`` with the following keys:
+
+        * ``products``: products.
+        * ``categories``: product categories.
+        * ``families``: product families (subcategories).
+        * ``producers``: producers.
+        * ``promogroups``
+
+        One can join these keys together: products have a ``producer_id`` key
+        and producers have an ``id`` key. Products also refer to their family;
+        families to their category, etc.
+        The ``producerproduct_id`` key can also be used to get the product’s
+        availability using ``get_store_availabilities``.
+        """
+        resp = self._request_json("/init", params={"locale": store_id})
+
+        return {k: _strip_mongodb_ids(resp[k])
+                for k in ("products", "categories", "promogroups", "families",
+                    "producers")}
 
 
 class Kbg(UnauthenticatedKbg):

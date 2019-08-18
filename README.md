@@ -38,10 +38,17 @@ print(k.logged_in()) # False
 Additionnally, `Kbg` has all the endpoints `UnauthenticatedKbg` has.
 
 ### `UnauthenticatedKbg` methods
-* `get_stores()` (`list` of `dict`s): get the list of stores (three at the
+* `get_stores()` (`list` of `dict`s): get the list of stores (four at the
   moment).
 * `get_store_availabilities(store_id)` (`dict`): get product availabilities at
   the given store.
+* `get_store_offer(store_id)` (`dict`): get the offer at a the given store.
+  This includes all products along with their producers, categories, and
+  families (subcategories).
+
+## Compatibility
+
+This library uses undocumented API endpoints, so it may break at any time.
 
 ## Naming
 

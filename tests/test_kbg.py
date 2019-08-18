@@ -4,6 +4,20 @@ import responses
 import unittest
 import kbg as k
 
+class TestUtilities(unittest.TestCase):
+    def test_strip_mongodb_ids(self):
+        xs = [{"id": 1}, {"id": 2}, {"id": 3}]
+        self.assertEqual(xs, k._strip_mongodb_ids(xs))
+
+        xs_id = []
+        for x in xs:
+            x = dict(x)
+            x["_id"] = "something123"
+            xs_id.append(x)
+
+        self.assertEqual(xs, k._strip_mongodb_ids(xs_id))
+
+
 class TestUnauthenticatedKbg(unittest.TestCase):
     def setUp(self):
         with responses.RequestsMock() as resps:
@@ -35,6 +49,26 @@ class TestUnauthenticatedKbg(unittest.TestCase):
                     r"\?locale=%s$" % store)
 
         self.assertEqual(availabilities, got_availabilities)
+
+    def test_get_store_offer(self):
+        store = "XYZ"
+        offer = {
+            "products": [{"id": "p1"}, {"id": "p2"}, {"id": "p3"}],
+            "categories": [{"id": "c1"}, {"id": "c2"}],
+            "promogroups": [],
+            "families": [{"id": "f1"}, {"id": "f2"}, {"id": "f3"}],
+            "producers": [{"id": "P1"}],
+        }
+
+        with responses.RequestsMock() as resps:
+            resps.add(responses.GET, k.API_ENDPOINT + "/init",
+                    json=offer)
+            got_offer = self.k.get_store_offer(store)
+            self.assertEqual(1, len(resps.calls))
+            self.assertRegexpMatches(resps.calls[0].request.url,
+                    r"\?locale=%s$" % store)
+
+        self.assertEqual(offer, got_offer)
 
 
 class TestKbg(unittest.TestCase):
