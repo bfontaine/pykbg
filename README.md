@@ -56,6 +56,55 @@ Additionnally, `Kbg` has all the endpoints `UnauthenticatedKbg` has.
 * `get_store_offer_dicts(store_id)` (`dict`): equivalent of `get_store_offer`
   that returns lookup ``dict``s rather than lists of items.
 
+### Examples
+Create a simple connection:
+```python3
+from kbg import Kbg
+
+k = Kbg("b@ptistefontaine.fr", "kjmVV4id9[$C")
+```
+
+#### Compute your total spending
+```python3
+total_spent = 0
+
+for order in k.get_all_customer_orders():
+    for product in order["products"]:
+        total_spent += product["consumer_price"]
+
+# get a price in euros rather than cents
+total_spent /= 100
+
+print("You spent a total of %.2f€ at Kelbongoo!" % total_spent)
+```
+
+#### Print your most-bought products
+```python3
+from collections import Counter
+
+my_store = "BOR"
+
+top_products = Counter()
+top_producers = Counter()
+store_products = k.get_store_offer_dicts(my_store)["products"]
+
+for order in k.get_all_customer_orders():
+    for product in order["products"]:
+        product_id = product["producerproduct_id"]
+        if product_id in store_products:
+            product = store_products[product_id]
+            top_products[product["product_name"]] += 1
+            top_producers[product["producer_name"]] += 1
+
+print("Top products:")
+for product, n in top_products.most_common(5):
+    print("%3d - %s" % (n, product))
+
+print("\nTop producers:")
+for producer, n in top_producers.most_common(5):
+    print("%3d - %s" % (n, producer))
+```
+
 ## Compatibility
 This library uses undocumented API endpoints, so it may break at any time.
 
