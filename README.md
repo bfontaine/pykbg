@@ -61,7 +61,7 @@ Create a simple connection:
 ```python3
 from kbg import Kbg
 
-k = Kbg("b@ptistefontaine.fr", "kjmVV4id9[$C")
+k = Kbg("your@email.com", "yourpassword")
 ```
 
 #### Compute your total spending
