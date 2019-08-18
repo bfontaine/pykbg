@@ -34,6 +34,7 @@ def _strip_mongodb_ids(xs):
         _strip_mongodb_id(x)
     return xs
 
+
 def _fix_order_fields(order):
     order = _strip_mongodb_id(order)
     order["store"] = order.pop("locale")
@@ -62,7 +63,7 @@ class UnauthenticatedKbg:
 
         if self._token:
             kwargs["headers"].setdefault("Authorization",
-                    "Bearer %s" % self._token)
+                                         "Bearer %s" % self._token)
 
         r = requests.request(**kwargs)
         r.raise_for_status()
@@ -121,7 +122,7 @@ class UnauthenticatedKbg:
 
         return {k: _strip_mongodb_ids(resp[k])
                 for k in ("products", "categories", "promogroups", "families",
-                    "producers")}
+                          "producers")}
 
     def get_store_offer_dicts(self, store_id):
         """
@@ -176,7 +177,7 @@ class Kbg(UnauthenticatedKbg):
             page = 1
 
         resp = self._request_json("/api/orders/fetch-for-consumer",
-                params={"page": page})
+                                  params={"page": page})
 
         orders = resp["items"]
 
@@ -217,8 +218,9 @@ class Kbg(UnauthenticatedKbg):
         the order was created, retrieved, paid for.
         """
         resp = self._request_json("/api/orders/fetch-detail",
-                # Not sure what this getPayments does
-                params={"order_id": order_id, "getPayments": "true"})
+                                  # Not sure what this getPayments does
+                                  params={"order_id": order_id,
+                                          "getPayments": "true"})
         order = _fix_order_fields(resp["order"])
         products_infos = {}
         for product_info in order.pop("producerproducts"):
