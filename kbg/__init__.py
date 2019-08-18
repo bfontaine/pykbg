@@ -3,6 +3,8 @@
 import json
 import requests
 
+__version__ = "0.0.1"
+
 API_ENDPOINT = "https://courses-api.kelbongoo.com"
 UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36"
 
@@ -11,8 +13,6 @@ BASE_HEADERS = {
     "Content-Type": "application/json",
     "User-Agent": UA,
 }
-
-__all__ = ["Kbg", "UnauthenticatedKbg"]
 
 class UnauthenticatedKbg:
     """
@@ -58,13 +58,24 @@ class UnauthenticatedKbg:
         # The website is French-only.
         return self._request_json("/locales")["locales"]
 
+    def get_store_availabilities(self, store_id):
+        """
+        Return a ``dict`` mapping product ids(?) to their availabilities(?) for
+        the current command window(?) in the given store.
+
+        ``store_id`` must be the three-uppercase-letters code of the store. See
+        ``get_stores`` for a list.
+        """
+        resp = self._request_json("/available", params={"locale": store_id})
+        return resp["available"]
+
 
 class Kbg(UnauthenticatedKbg):
     """
     Represent a connection to Kelbongoo’s website.
     """
     def __init__(self, email, password):
-        self._token = None
+        super().__init__()
         self._login(email, password)
 
     def _login(self, email, password):

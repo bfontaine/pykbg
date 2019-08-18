@@ -23,17 +23,19 @@ print(k.logged_in()) # False
 ```
 
 ### `Kbg` methods
-* `logged_in` (`bool`): return a boolean indicating if the object is
+* `logged_in()` (`bool`): return a boolean indicating if the object is
   successfully connected. The `Kbg` constructor raises an exception on failed
   login.
-* `get_consumer_information` (`dict`): get some information about the consumer,
+* `get_consumer_information()` (`dict`): get some information about the consumer,
   including first and last name, email, phone, email settings.
 
 Additionnally, `Kbg` has all the endpoints `UnauthenticatedKbg` has.
 
 ### `UnauthenticatedKbg` methods
-* `get_stores` (`list` of `dict`s): get the list of stores (three at the
+* `get_stores()` (`list` of `dict`s): get the list of stores (three at the
   moment).
+* `get_store_availabilities(store_id)` (`dict`): get product availabilities at
+  the given store.
 
 ## Naming
 
