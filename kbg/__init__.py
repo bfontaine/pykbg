@@ -155,7 +155,7 @@ class Kbg(UnauthenticatedKbg):
         orders = _strip_mongodb_ids(resp["items"])
 
         for order in orders:
-            order["products"] = _strip_mongodb_ids(order["items"])
+            order["products"] = _strip_mongodb_ids(order.pop("items"))
 
         next_page = None
         if orders:
