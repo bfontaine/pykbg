@@ -185,7 +185,7 @@ class TestKbg(unittest.TestCase):
                  }],
         }
 
-        def get_orders(request):
+        def get_mock_orders(request):
             m = re.match(r".*\?page=(\d+)", request.url)
             self.assertIsNotNone(m)
             page = int(m.group(1))
@@ -202,7 +202,7 @@ class TestKbg(unittest.TestCase):
                     responses.GET,
                     k.API_ENDPOINT + "/api/orders/fetch-for-consumer",
                     content_type="application/json",
-                    callback=get_orders)
+                    callback=get_mock_orders)
 
             all_orders = self.k.get_all_customer_orders()
             self.assertEqual(0, len(resps.calls))
@@ -221,6 +221,61 @@ class TestKbg(unittest.TestCase):
                 "store": "XYZ",
                 "products": [{"id": 42}, {"id": 44}]
             }, order2)
+            self.assertEqual(2, len(resps.calls))
+
+            self.assertRaises(StopIteration, lambda: next(all_orders))
+            self.assertEqual(2, len(resps.calls))
+
+    def test_get_all_full_customer_orders(self):
+        with responses.RequestsMock() as resps:
+            resps.add(responses.GET,
+                    k.API_ENDPOINT + "/api/orders/fetch-for-consumer",
+                    json={
+                        "items": [
+                            {"_id": "xx",
+                             "locale": "ABC",
+                             "items": [
+                                 {"_id": "p1"},
+                                 {"_id": "p2"},
+                             ],
+                            }
+                        ],
+                        "count": 1})
+
+            resps.add(
+                responses.GET,
+                k.API_ENDPOINT + "/api/orders/fetch-detail",
+                json={
+                    "order": {
+                        "_id": "xx",
+                        "locale": "ABC",
+                        "items": [
+                            {"producerproduct_id": "p1", "quantity": 1},
+                            {"producerproduct_id": "p2", "quantity": 2},
+                        ],
+                        "producerproducts": [
+                            {"_id": "p1", "product_name": "product 1"},
+                            {"_id": "p2", "product_name": "product 2"},
+                        ],
+                    }
+                })
+
+            all_orders = self.k.get_all_customer_orders(full=True)
+            self.assertEqual(0, len(resps.calls))
+
+            order1 = next(all_orders)
+            self.assertEqual({
+                "id": "xx",
+                "store": "ABC",
+                "products": [
+                    {"producerproduct_id": "p1",
+                     "product_name": "product 1",
+                     "quantity": 1},
+                    {"producerproduct_id": "p2",
+                     "product_name": "product 2",
+                     "quantity": 2},
+                ],
+            }, order1)
             self.assertEqual(2, len(resps.calls))
 
             self.assertRaises(StopIteration, lambda: next(all_orders))

@@ -183,14 +183,18 @@ class Kbg(UnauthenticatedKbg):
             "next_page": next_page,
         }
 
-    def get_all_customer_orders(self):
+    def get_all_customer_orders(self, full=False):
         """
         Generator of all the logged-in customer’s orders.
+        If ``full`` is ``True``, make another call to get each order’s full
+        information (see ``get_customer_orders()``).
         """
         page = 1
         while page:
             orders_resp = self.get_customer_orders(page=page)
             for order in orders_resp["orders"]:
+                if full:
+                    order = self.get_customer_order(order["id"])
                 yield order
             page = orders_resp["next_page"]
 

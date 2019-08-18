@@ -34,9 +34,13 @@ print(k.logged_in()) # False
 * `get_customer_information()` (`dict`): get some information about the
   consumer, including first and last name, email, phone, email settings.
 * `get_customer_orders(page=1)` (`dict`): get all the customer’s orders
-    (paginated endpoint).
+  (paginated endpoint).
 * `get_all_customer_orders()` (generator): yield all the customer’s orders.
-  This is a useful wrapper around the previous method.
+  This is a useful wrapper around the previous method. If `full=True` is
+  passed, call `get_customer_order` on each order to yield its full
+  information.
+* `get_customer_order(order_id)` (`dict`): get more information about a
+  specific order.
 
 Additionnally, `Kbg` has all the endpoints `UnauthenticatedKbg` has.
 
@@ -52,9 +56,14 @@ Additionnally, `Kbg` has all the endpoints `UnauthenticatedKbg` has.
 ## Compatibility
 This library uses undocumented API endpoints, so it may break at any time.
 
-## Naming
+## Notes
 Don’t confuse KBG (Kelbongoo) with [KGB](https://en.wikipedia.org/wiki/KGB).
 
-Note that the Kelbongoo API refers to stores as “locales”, using the first tree
-letters in upper-case as a primary key: `BOR` is Borrégo and `BIC` is Bichat,
-for example.
+The Kelbongoo API refers to stores as “locales”, using the first tree letters
+in upper-case as a primary key: `BOR` is Borrégo and `BIC` is Bichat, for
+example.
+
+Prices are given in €uro cents; you need to divide them by 100 to get the
+price in €uro: `"consumer_price": 221` means it’s something that costs €2.21.
+
+Please throttle your requests to respect Kelbongoo’s servers.
