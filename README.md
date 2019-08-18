@@ -6,7 +6,9 @@
 
 ## Install
 
-    pip3 install kbg
+```shell
+pip3 install kbg
+```
 
 This requires Python ≥3.5.
 
