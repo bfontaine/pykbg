@@ -11,7 +11,6 @@
 This requires Python ≥3.5.
 
 ## Usage
-
 Use the `Kbg` class to initiate a connection:
 ```python3
 from kbg import Kbg
@@ -32,8 +31,12 @@ print(k.logged_in()) # False
 * `logged_in()` (`bool`): return a boolean indicating if the object is
   successfully connected. The `Kbg` constructor raises an exception on failed
   login.
-* `get_consumer_information()` (`dict`): get some information about the consumer,
-  including first and last name, email, phone, email settings.
+* `get_customer_information()` (`dict`): get some information about the
+  consumer, including first and last name, email, phone, email settings.
+* `get_customer_orders(page=1)` (`dict`): get all the customer’s orders
+    (paginated endpoint).
+* `get_all_customer_orders()` (generator): yield all the customer’s orders.
+  This is a useful wrapper around the previous method.
 
 Additionnally, `Kbg` has all the endpoints `UnauthenticatedKbg` has.
 
@@ -47,11 +50,9 @@ Additionnally, `Kbg` has all the endpoints `UnauthenticatedKbg` has.
   families (subcategories).
 
 ## Compatibility
-
 This library uses undocumented API endpoints, so it may break at any time.
 
 ## Naming
-
 Don’t confuse KBG (Kelbongoo) with [KGB](https://en.wikipedia.org/wiki/KGB).
 
 Note that the Kelbongoo API refers to stores as “locales”, using the first tree

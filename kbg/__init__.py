@@ -14,18 +14,26 @@ BASE_HEADERS = {
     "User-Agent": UA,
 }
 
+
+# Some endpoints return lists of MongoDB objects. We probably don't need the
+# internal ids, so let's strip them.
+def _strip_mongodb_id(x):
+    "Remove _id from a dict if it's there. Update the object in-place."
+    if "_id" in x:
+        del x["_id"]
+    return x
+
+
 def _strip_mongodb_ids(xs):
-    # Some endpoints return lists of MongoDB objects. We probably don't need
-    # the internal ids, so let's strip them.
     for x in xs:
-        if "_id" in x:
-            del x["_id"]
+        _strip_mongodb_id(x)
     return xs
+
 
 class UnauthenticatedKbg:
     """
-    Simpler version of Kbg that exposes endpoints which don't need a logged-in
-    user.
+    Simpler version of ``Kbg`` that exposes endpoints which don't need a
+    logged-in user.
     """
 
     def __init__(self):
@@ -120,8 +128,55 @@ class Kbg(UnauthenticatedKbg):
         })
         self._token = resp["token"]
 
-    def get_consumer_information(self):
+    def get_customer_information(self):
         """
-        Return information about the logged-in consumer.
+        Return information about the logged-in customer.
         """
         return self._request_json("/api/consumer")["consumer"]
+
+    def get_customer_orders(self, page=1):
+        """
+        Get the logged-in customer’s orders. Return a ``dict`` with the
+        following keys:
+        * ``orders``
+        * ``count``: total orders count.
+        * ``page``: the current page, passed as an argument (min. 1).
+        * ``next_page``: the next page to request, or ``None`` if it's the last
+          page. This is guessed from the total count; it’s not a response from
+          the API.
+        """
+        if page <= 0:
+            # the server returns a 500 on page<=0
+            page = 1
+
+        resp = self._request_json("/api/orders/fetch-for-consumer",
+                params={"page": page})
+
+        orders = _strip_mongodb_ids(resp["items"])
+
+        for order in orders:
+            order["products"] = _strip_mongodb_ids(order["items"])
+
+        next_page = None
+        if orders:
+            current_count = 10 * (page-1) + len(orders)
+            if current_count < resp["count"]:
+                next_page = page + 1
+
+        return {
+            "orders": orders,
+            "count": resp["count"],
+            "page": page,
+            "next_page": next_page,
+        }
+
+    def get_all_customer_orders(self):
+        """
+        Generator of all the logged-in customer’s orders.
+        """
+        page = 1
+        while page:
+            orders_resp = self.get_customer_orders(page=page)
+            for order in orders_resp["orders"]:
+                yield order
+            page = orders_resp["next_page"]
