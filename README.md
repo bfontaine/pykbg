@@ -38,7 +38,8 @@ print(k.logged_in()) # False
 * `get_all_customer_orders()` (generator): yield all the customer’s orders.
   This is a useful wrapper around the previous method. If `full=True` is
   passed, call `get_customer_order` on each order to yield its full
-  information.
+  information. If all you want is the products’ full names, use
+  ``get_store_offer_dicts`` as a lookup map to save unnecessary requests.
 * `get_customer_order(order_id)` (`dict`): get more information about a
   specific order.
 
@@ -52,6 +53,8 @@ Additionnally, `Kbg` has all the endpoints `UnauthenticatedKbg` has.
 * `get_store_offer(store_id)` (`dict`): get the offer at a the given store.
   This includes all products along with their producers, categories, and
   families (subcategories).
+* `get_store_offer_dicts(store_id)` (`dict`): equivalent of `get_store_offer`
+  that returns lookup ``dict``s rather than lists of items.
 
 ## Compatibility
 This library uses undocumented API endpoints, so it may break at any time.

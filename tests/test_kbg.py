@@ -80,7 +80,39 @@ class TestUnauthenticatedKbg(unittest.TestCase):
             self.assertRegexpMatches(resps.calls[0].request.url,
                     r"\?locale=%s$" % store)
 
-        self.assertSequenceEqual(offer, got_offer)
+        self.assertEqual(offer, got_offer)
+
+    def test_get_store_offer_dicts(self):
+        store = "XYZ"
+        offer = {
+            "products": [
+                {"producerproduct_id": "p1"},
+                {"producerproduct_id": "p2"},
+            ],
+            "categories": [{"id": "c1"}, {"id": "c2"}],
+            "promogroups": [],
+            "families": [{"id": "f1"}, {"id": "f2"}],
+            "producers": [{"id": "P1", "name": "A"}],
+        }
+
+        with responses.RequestsMock() as resps:
+            resps.add(responses.GET, k.API_ENDPOINT + "/init",
+                    json=offer)
+            offer_dict = self.k.get_store_offer_dicts(store)
+            self.assertEqual(1, len(resps.calls))
+            self.assertRegexpMatches(resps.calls[0].request.url,
+                    r"\?locale=%s$" % store)
+
+        self.assertEqual({
+            "products": {
+                "p1": {"producerproduct_id": "p1"},
+                "p2": {"producerproduct_id": "p2"},
+            },
+            "categories": {"c1": {"id": "c1"}, "c2": {"id": "c2"}},
+            "promogroups": {},
+            "families": {"f1": {"id": "f1"}, "f2": {"id": "f2"}},
+            "producers": {"P1": {"id": "P1", "name": "A"}},
+        }, offer_dict)
 
 
 class TestKbg(unittest.TestCase):

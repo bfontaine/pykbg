@@ -125,6 +125,21 @@ class UnauthenticatedKbg:
                 for k in ("products", "categories", "promogroups", "families",
                     "producers")}
 
+    def get_store_offer_dicts(self, store_id):
+        """
+        Equivalent of ``get_store_offer`` but each key is a ``dict`` mapping
+        items by their id.
+        """
+        offer = self.get_store_offer(store_id)
+        for k, items in offer.items():
+            id_key = "id"
+            if k == "products":
+                id_key = "producerproduct_id"
+
+            offer[k] = {item[id_key]: item for item in items}
+
+        return offer
+
 
 class Kbg(UnauthenticatedKbg):
     """
