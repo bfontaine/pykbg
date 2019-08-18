@@ -6,12 +6,10 @@ import requests
 __version__ = "0.0.1"
 
 API_ENDPOINT = "https://courses-api.kelbongoo.com"
-UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36"
 
 BASE_HEADERS = {
     "Accept": "application/json",
     "Content-Type": "application/json",
-    "User-Agent": UA,
 }
 
 
