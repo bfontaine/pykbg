@@ -4,6 +4,12 @@
 
 [Kelbongoo]: https://www.kelbongoo.com
 
+## Install
+
+    pip3 install kbg
+
+This requires Python ≥3.5.
+
 ## Usage
 
 Use the `Kbg` class to initiate a connection:
