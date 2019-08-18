@@ -18,9 +18,16 @@ BASE_HEADERS = {
 # Some endpoints return lists of MongoDB objects. We probably don't need the
 # internal ids, so let's strip them.
 def _strip_mongodb_id(x):
-    "Remove _id from a dict if it's there. Update the object in-place."
+    """
+    Rename the ``_id`` key from a dict as ``id``, if the latter doesn't already
+    exist. If that's the case, remove the key.
+    Update the object in-place.
+    """
     if "_id" in x:
-        del x["_id"]
+        if "id" not in x:
+            x["id"] = x.pop("_id")
+        else:
+            del x["_id"]
     return x
 
 
@@ -28,6 +35,12 @@ def _strip_mongodb_ids(xs):
     for x in xs:
         _strip_mongodb_id(x)
     return xs
+
+def _fix_order_fields(order):
+    order = _strip_mongodb_id(order)
+    order["store"] = order.pop("locale")
+    order["products"] = _strip_mongodb_ids(order.pop("items"))
+    return order
 
 
 class UnauthenticatedKbg:
@@ -152,10 +165,10 @@ class Kbg(UnauthenticatedKbg):
         resp = self._request_json("/api/orders/fetch-for-consumer",
                 params={"page": page})
 
-        orders = _strip_mongodb_ids(resp["items"])
+        orders = resp["items"]
 
         for order in orders:
-            order["products"] = _strip_mongodb_ids(order.pop("items"))
+            order = _fix_order_fields(order)
 
         next_page = None
         if orders:
@@ -180,3 +193,25 @@ class Kbg(UnauthenticatedKbg):
             for order in orders_resp["orders"]:
                 yield order
             page = orders_resp["next_page"]
+
+    def get_customer_order(self, order_id):
+        """
+        Get more details about an order, including product names and dates when
+        the order was created, retrieved, paid for.
+        """
+        resp = self._request_json("/api/orders/fetch-detail",
+                # Not sure what this getPayments does
+                params={"order_id": order_id, "getPayments": "true"})
+        order = _fix_order_fields(resp["order"])
+        products_infos = {}
+        for product_info in order.pop("producerproducts"):
+            product_info = _strip_mongodb_id(product_info)
+            pid = product_info["id"]
+            del product_info["id"]
+            products_infos[pid] = product_info
+
+        for product in order["products"]:
+            product = _strip_mongodb_id(product)
+            product.update(products_infos[product["producerproduct_id"]])
+
+        return order

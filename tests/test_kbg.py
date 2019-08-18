@@ -11,7 +11,7 @@ import kbg as k
 class TestUtilities(unittest.TestCase):
     def test_strip_mongodb_id(self):
         self.assertEqual({}, k._strip_mongodb_id({}))
-        self.assertEqual({}, k._strip_mongodb_id({"_id": "yo"}))
+        self.assertEqual({"id": "yo"}, k._strip_mongodb_id({"_id": "yo"}))
 
     def test_strip_mongodb_ids(self):
         xs = [{"id": 1}, {"id": 2}, {"id": 3}]
@@ -24,6 +24,10 @@ class TestUtilities(unittest.TestCase):
             xs_id.append(x)
 
         self.assertSequenceEqual(xs, k._strip_mongodb_ids(xs_id))
+        self.assertSequenceEqual(
+            [{"id": 1}, {"id": 2}, {"id": 3}],
+            k._strip_mongodb_ids(
+                [{"id": 1, "_id": "xx"}, {"_id": 2}, {"id": 3}]))
 
 
 class TestUnauthenticatedKbg(unittest.TestCase):
@@ -131,12 +135,14 @@ class TestKbg(unittest.TestCase):
                     json={
                         "items": [
                             {"_id": "xx",
+                             "locale": "XYZ",
                              "items": [
                                  {"_id": "xy", "id": 42},
                                  {"_id": "xp", "id": 43},
                              ]
                             },
                             {"_id": "xz",
+                             "locale": "XYZ",
                              "items": [
                                  {"_id": "xm", "id": 42},
                                  {"_id": "xn", "id": 44},
@@ -149,8 +155,12 @@ class TestKbg(unittest.TestCase):
             resp = self.k.get_customer_orders()
             self.assertEqual({
                 "orders": [
-                    {"products": [{"id": 42}, {"id": 43}]},
-                    {"products": [{"id": 42}, {"id": 44}]},
+                    {"id": "xx",
+                     "store": "XYZ",
+                     "products": [{"id": 42}, {"id": 43}]},
+                    {"id": "xz",
+                     "store": "XYZ",
+                     "products": [{"id": 42}, {"id": 44}]},
                 ],
                 "count": 2,
                 "page": 1,
@@ -160,17 +170,19 @@ class TestKbg(unittest.TestCase):
     def test_get_all_customer_orders(self):
         mock_orders = {
             1: [{"_id": "xx",
-                "items": [
-                    {"_id": "xy", "id": 42},
-                    {"_id": "xp", "id": 43},
-                    ]
-                }],
+                 "locale": "ABC",
+                 "items": [
+                     {"_id": "xy", "id": 42},
+                     {"_id": "xp", "id": 43},
+                     ]
+                 }],
             2: [{"_id": "xz",
-                "items": [
-                    {"_id": "xm", "id": 42},
-                    {"_id": "xn", "id": 44},
-                    ]
-                }],
+                 "locale": "XYZ",
+                 "items": [
+                     {"_id": "xm", "id": 42},
+                     {"_id": "xn", "id": 44},
+                     ]
+                 }],
         }
 
         def get_orders(request):
@@ -196,12 +208,54 @@ class TestKbg(unittest.TestCase):
             self.assertEqual(0, len(resps.calls))
 
             order1 = next(all_orders)
-            self.assertEqual({"products": [{"id": 42}, {"id": 43}]}, order1)
+            self.assertEqual({
+                "id": "xx",
+                "store": "ABC",
+                "products": [{"id": 42}, {"id": 43}]
+            }, order1)
             self.assertEqual(1, len(resps.calls))
 
             order2 = next(all_orders)
-            self.assertEqual({"products": [{"id": 42}, {"id": 44}]}, order2)
+            self.assertEqual({
+                "id": "xz",
+                "store": "XYZ",
+                "products": [{"id": 42}, {"id": 44}]
+            }, order2)
             self.assertEqual(2, len(resps.calls))
 
             self.assertRaises(StopIteration, lambda: next(all_orders))
             self.assertEqual(2, len(resps.calls))
+
+    def test_get_customer_order(self):
+        with responses.RequestsMock() as resps:
+            resps.add(
+                responses.GET,
+                k.API_ENDPOINT + "/api/orders/fetch-detail",
+                json={
+                    "order": {
+                        "_id": "xxx",
+                        "locale": "XYZ",
+                        "items": [
+                            {"producerproduct_id": "p1", "quantity": 1},
+                            {"producerproduct_id": "p2", "quantity": 2},
+                        ],
+                        "producerproducts": [
+                            {"_id": "p1", "product_name": "product 1"},
+                            {"_id": "p2", "product_name": "product 2"},
+                        ],
+                    }
+                })
+
+            order = self.k.get_customer_order("xxx")
+            self.assertEqual({
+                "id": "xxx",
+                "store": "XYZ",
+                "products": [
+                    {"producerproduct_id": "p1",
+                     "product_name": "product 1",
+                     "quantity": 1},
+                    {"producerproduct_id": "p2",
+                     "product_name": "product 2",
+                     "quantity": 2},
+                ],
+            }, order)
