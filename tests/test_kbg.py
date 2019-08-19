@@ -108,8 +108,8 @@ class TestUnauthenticatedKbg(unittest.TestCase):
         store = "XYZ"
         offer = {
             "products": [
-                {"producerproduct_id": "p1"},
-                {"producerproduct_id": "p2"},
+                {"producerproduct_id": "p1", "_id": "x"},
+                {"producerproduct_id": "p2", "_id": "y"},
             ],
             "categories": [{"id": "c1"}, {"id": "c2"}],
             "promogroups": [],
@@ -345,8 +345,12 @@ class TestKbg(unittest.TestCase):
                         "_id": "xxx",
                         "locale": "XYZ",
                         "items": [
-                            {"producerproduct_id": "p1", "quantity": 1},
-                            {"producerproduct_id": "p2", "quantity": 2},
+                            {"producerproduct_id": "p1",
+                             "_id": "x",
+                             "quantity": 1},
+                            {"producerproduct_id": "p2",
+                             "_id": "y",
+                             "quantity": 2},
                         ],
                         "producerproducts": [
                             {"_id": "p1", "product_name": "product 1"},

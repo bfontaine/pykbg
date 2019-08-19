@@ -129,12 +129,12 @@ class UnauthenticatedKbg:
             offer = {}
             for k in ("products", "categories", "promogroups", "families",
                       "producers"):
-                items = _strip_mongodb_ids(resp[k])
+                items = resp[k]
 
                 if k == "products":
                     items = [_fix_product_fields(p) for p in items]
 
-                offer[k] = items
+                offer[k] = _strip_mongodb_ids(items)
 
             self._store_offers[store_id] = offer
 
