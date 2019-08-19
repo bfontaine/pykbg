@@ -29,34 +29,53 @@ k = UnauthenticatedKbg()
 print(k.logged_in()) # False
 ```
 
-### `Kbg` methods
-* `logged_in()` (`bool`): return a boolean indicating if the object is
-  successfully connected. The `Kbg` constructor raises an exception on failed
-  login.
-* `get_customer_information()` (`dict`): get some information about the
-  consumer, including first and last name, email, phone, email settings.
-* `get_customer_orders(page=1)` (`dict`): get all the customer’s orders
-  (paginated endpoint).
-* `get_all_customer_orders()` (generator): yield all the customer’s orders.
-  This is a useful wrapper around the previous method. If `full=True` is
-  passed, call `get_customer_order` on each order to yield its full
-  information. If all you want is the products’ full names, use
-  ``get_store_offer_dicts`` as a lookup map to save unnecessary requests.
-* `get_customer_order(order_id)` (`dict`): get more information about a
-  specific order.
+### `Kbg`
+The `Kbg` constructor takes an email and a password. It raises an exception on
+failed login.
 
-Additionnally, `Kbg` has all the endpoints `UnauthenticatedKbg` has.
+`Kbg` has all the endpoints `UnauthenticatedKbg` has, plus the following ones:
 
-### `UnauthenticatedKbg` methods
-* `get_stores()` (`list` of `dict`s): get the list of stores (four at the
-  moment).
-* `get_store_availabilities(store_id)` (`dict`): get product availabilities at
-  the given store.
-* `get_store_offer(store_id)` (`dict`): get the offer at a the given store.
-  This includes all products along with their producers, categories, and
-  families (subcategories).
-* `get_store_offer_dicts(store_id)` (`dict`): equivalent of `get_store_offer`
-  that returns lookup ``dict``s rather than lists of items.
+#### `logged_in()`
+Return a boolean indicating if the object is successfully connected.
+
+#### `get_customer_information()`
+Get some information as a `dict` about the consumer, including first and last
+name, email, phone, email settings.
+
+#### `get_customer_orders(page=1)`
+Get all the customer’s orders. This is a paginated endpoint. It returns a `dict` with an `orders` key as well as a `count`, `page` and `next_page` ones that you can use to get the next pages, if any.
+
+#### `get_all_customer_orders(full=False)`
+Yield all the customer’s orders. This is a useful wrapper around
+`get_customer_order`.
+
+If `full=True` is passed, call `get_customer_order` on each order to yield its
+full information.
+
+Note that if all you want is the products’ full names, use
+`get_store_offer_dicts` as a lookup map instead of `full=True` to save
+unnecessary requests.
+
+#### `get_customer_order(order_id)`
+Get more information about a specific order (`dict`).
+
+### `UnauthenticatedKbg`
+The `UnauthenticatedKbg` constructor doesn’t take any argument.
+
+#### `get_stores()`
+Get the list of stores (`list` of `dict`s).
+
+#### `get_store_availabilities(store_id)`
+Get product availabilities at the given store for the current command window,
+as a map of product ids to units count.
+
+#### `get_store_offer(store_id)`
+Get the offer at a the given store (`dict`). This includes all products along
+with their producers, categories, and families (subcategories).
+
+#### `get_store_offer_dicts(store_id)`
+Equivalent of `get_store_offer` that returns lookup `dict`s rather than lists
+of items.
 
 ### Examples
 Create a simple connection:
