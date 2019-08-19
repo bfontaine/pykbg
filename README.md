@@ -75,7 +75,7 @@ with their producers, categories, and families (subcategories).
 
 Note this method is cached; use `force=True` to force the API call.
 
-#### `get_store_offer_dicts(store_id)`
+#### `get_store_offer_dicts(store_id, force=False)`
 Equivalent of `get_store_offer` that returns lookup `dict`s rather than lists
 of items.
 

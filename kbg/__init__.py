@@ -140,12 +140,12 @@ class UnauthenticatedKbg:
 
         return self._store_offers[store_id]
 
-    def get_store_offer_dicts(self, store_id):
+    def get_store_offer_dicts(self, store_id, force=False):
         """
         Equivalent of ``get_store_offer`` but each key is a ``dict`` mapping
         items by their id.
         """
-        offer = self.get_store_offer(store_id)
+        offer = self.get_store_offer(store_id, force=force)
         for k, items in offer.items():
             offer[k] = {item["id"]: item for item in items}
 
