@@ -73,14 +73,36 @@ class TestUnauthenticatedKbg(unittest.TestCase):
         }
 
         with responses.RequestsMock() as resps:
-            resps.add(responses.GET, k.API_ENDPOINT + "/init",
-                    json=offer)
+            resps.add(responses.GET, k.API_ENDPOINT + "/init", json=offer)
             got_offer = self.k.get_store_offer(store)
             self.assertEqual(1, len(resps.calls))
             self.assertRegexpMatches(resps.calls[0].request.url,
                     r"\?locale=%s$" % store)
 
         self.assertEqual(offer, got_offer)
+
+        with responses.RequestsMock() as resps:
+            # ensure no other call is made
+            self.assertEqual(offer, self.k.get_store_offer(store))
+            self.assertEqual(0, len(resps.calls))
+
+            # ensure a call is made if another store is requested
+            resps.add(responses.GET, k.API_ENDPOINT + "/init", json=offer)
+            self.assertEqual(offer, self.k.get_store_offer("DEF"))
+            self.assertEqual(1, len(resps.calls))
+
+
+        with responses.RequestsMock() as resps:
+            resps.add(responses.GET, k.API_ENDPOINT + "/init", json=offer)
+            self.assertEqual(offer, self.k.get_store_offer(store, force=True))
+            self.assertEqual(1, len(resps.calls))
+
+            self.assertEqual(offer, self.k.get_store_offer(store, force=True))
+            self.assertEqual(2, len(resps.calls))
+
+            self.assertEqual(offer, self.k.get_store_offer(store))
+            self.assertEqual(2, len(resps.calls))
+
 
     def test_get_store_offer_dicts(self):
         store = "XYZ"

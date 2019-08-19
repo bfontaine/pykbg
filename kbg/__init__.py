@@ -50,6 +50,7 @@ class UnauthenticatedKbg:
 
     def __init__(self):
         self._token = None
+        self._store_offers = {}
 
     def _request_json(self, path, **kwargs):
         headers = {}
@@ -101,7 +102,7 @@ class UnauthenticatedKbg:
         resp = self._request_json("/available", params={"locale": store_id})
         return resp["available"]
 
-    def get_store_offer(self, store_id):
+    def get_store_offer(self, store_id, force=False):
         """
         Return the current offer in the given store. The returned value is a
         ``dict`` with the following keys:
@@ -118,11 +119,15 @@ class UnauthenticatedKbg:
         The ``producerproduct_id`` key can also be used to get the product’s
         availability using ``get_store_availabilities``.
         """
-        resp = self._request_json("/init", params={"locale": store_id})
+        if force or store_id not in self._store_offers:
+            resp = self._request_json("/init", params={"locale": store_id})
+            offer = {k: _strip_mongodb_ids(resp[k])
+                    for k in ("products", "categories", "promogroups",
+                              "families", "producers")}
 
-        return {k: _strip_mongodb_ids(resp[k])
-                for k in ("products", "categories", "promogroups", "families",
-                          "producers")}
+            self._store_offers[store_id] = offer
+
+        return self._store_offers[store_id]
 
     def get_store_offer_dicts(self, store_id):
         """

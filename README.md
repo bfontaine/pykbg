@@ -69,9 +69,11 @@ Get the list of stores (`list` of `dict`s).
 Get product availabilities at the given store for the current command window,
 as a map of product ids to units count.
 
-#### `get_store_offer(store_id)`
+#### `get_store_offer(store_id, force=False)`
 Get the offer at a the given store (`dict`). This includes all products along
 with their producers, categories, and families (subcategories).
+
+Note this method is cached; use `force=True` to force the API call.
 
 #### `get_store_offer_dicts(store_id)`
 Equivalent of `get_store_offer` that returns lookup `dict`s rather than lists
