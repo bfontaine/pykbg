@@ -113,7 +113,7 @@ store_products = k.get_store_offer_dicts(my_store)["products"]
 
 for order in k.get_all_customer_orders():
     for product in order["products"]:
-        product_id = product["producerproduct_id"]
+        product_id = product["id"]
         if product_id in store_products:
             product = store_products[product_id]
             top_products[product["product_name"]] += 1

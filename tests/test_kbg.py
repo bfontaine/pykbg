@@ -127,8 +127,8 @@ class TestUnauthenticatedKbg(unittest.TestCase):
 
         self.assertEqual({
             "products": {
-                "p1": {"producerproduct_id": "p1"},
-                "p2": {"producerproduct_id": "p2"},
+                "p1": {"id": "p1"},
+                "p2": {"id": "p2"},
             },
             "categories": {"c1": {"id": "c1"}, "c2": {"id": "c2"}},
             "promogroups": {},
@@ -322,10 +322,10 @@ class TestKbg(unittest.TestCase):
                 "id": "xx",
                 "store": "ABC",
                 "products": [
-                    {"producerproduct_id": "p1",
+                    {"id": "p1",
                      "product_name": "product 1",
                      "quantity": 1},
-                    {"producerproduct_id": "p2",
+                    {"id": "p2",
                      "product_name": "product 2",
                      "quantity": 2},
                 ],
@@ -360,11 +360,7 @@ class TestKbg(unittest.TestCase):
                 "id": "xxx",
                 "store": "XYZ",
                 "products": [
-                    {"producerproduct_id": "p1",
-                     "product_name": "product 1",
-                     "quantity": 1},
-                    {"producerproduct_id": "p2",
-                     "product_name": "product 2",
-                     "quantity": 2},
+                    {"id": "p1", "product_name": "product 1", "quantity": 1},
+                    {"id": "p2", "product_name": "product 2", "quantity": 2},
                 ],
             }, order)

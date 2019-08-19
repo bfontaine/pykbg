@@ -35,10 +35,16 @@ def _strip_mongodb_ids(xs):
     return xs
 
 
+def _fix_product_fields(product):
+    if "producerproduct_id" in product and "id" not in product:
+        product["id"] = product.pop("producerproduct_id")
+    return product
+
 def _fix_order_fields(order):
     order = _strip_mongodb_id(order)
     order["store"] = order.pop("locale")
-    order["products"] = _strip_mongodb_ids(order.pop("items"))
+    order["products"] = _strip_mongodb_ids(
+            [_fix_product_fields(p) for p in order.pop("items")])
     return order
 
 
@@ -95,9 +101,8 @@ class UnauthenticatedKbg:
         ``store_id`` must be the three-uppercase-letters code of the store. See
         ``get_stores`` for a list.
 
-        See ``get_store_offer`` to get all products and their
-        ``producerproduct_id`` key that you can use in the availability
-        ``dict``.
+        See ``get_store_offer`` to get all products and their ``id`` key that
+        you can use in the availability ``dict``.
         """
         resp = self._request_json("/available", params={"locale": store_id})
         return resp["available"]
@@ -116,14 +121,20 @@ class UnauthenticatedKbg:
         One can join these keys together: products have a ``producer_id`` key
         and producers have an ``id`` key. Products also refer to their family;
         families to their category, etc.
-        The ``producerproduct_id`` key can also be used to get the product’s
-        availability using ``get_store_availabilities``.
+        The ``id`` key can also be used to get the product’s availability using
+        ``get_store_availabilities``.
         """
         if force or store_id not in self._store_offers:
             resp = self._request_json("/init", params={"locale": store_id})
-            offer = {k: _strip_mongodb_ids(resp[k])
-                    for k in ("products", "categories", "promogroups",
-                              "families", "producers")}
+            offer = {}
+            for k in ("products", "categories", "promogroups", "families",
+                      "producers"):
+                items = _strip_mongodb_ids(resp[k])
+
+                if k == "products":
+                    items = [_fix_product_fields(p) for p in items]
+
+                offer[k] = items
 
             self._store_offers[store_id] = offer
 
@@ -136,11 +147,7 @@ class UnauthenticatedKbg:
         """
         offer = self.get_store_offer(store_id)
         for k, items in offer.items():
-            id_key = "id"
-            if k == "products":
-                id_key = "producerproduct_id"
-
-            offer[k] = {item[id_key]: item for item in items}
+            offer[k] = {item["id"]: item for item in items}
 
         return offer
 
@@ -236,6 +243,6 @@ class Kbg(UnauthenticatedKbg):
 
         for product in order["products"]:
             product = _strip_mongodb_id(product)
-            product.update(products_infos[product["producerproduct_id"]])
+            product.update(products_infos[product["id"]])
 
         return order
