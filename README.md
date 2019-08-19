@@ -13,6 +13,13 @@ consumer ([short food supply chain][sfsc]).
 [sfsc]: https://en.wikipedia.org/wiki/Short_food_supply_chains
 [social economy]: https://en.wikipedia.org/wiki/Social_economy
 
+* [Install](#install)
+* [Usage](#usage)
+* [API Docs](#api-docs)
+* [Examples](#examples)
+* [Compatibility](#compatibility)
+* [Notes](#notes)
+
 ## Install
 
 ```shell
@@ -37,6 +44,8 @@ from kbg import UnauthenticatedKbg
 k = UnauthenticatedKbg()
 print(k.logged_in()) # False
 ```
+
+## API Docs
 
 ### `Kbg`
 The `Kbg` constructor takes an email and a password. It raises an exception on
