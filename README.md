@@ -4,6 +4,15 @@
 
 [Kelbongoo]: https://www.kelbongoo.com
 
+Kelbongoo is a [social economy][] company operating in the East of Paris,
+France. It sells products from small local producers (mostly located in the
+[Picardy][]), and is the only intermediary between the producer and the
+consumer ([short food supply chain][sfsc]).
+
+[Picardy]: https://en.wikipedia.org/wiki/Picardy
+[sfsc]: https://en.wikipedia.org/wiki/Short_food_supply_chains
+[social economy]: https://en.wikipedia.org/wiki/Social_economy
+
 ## Install
 
 ```shell
