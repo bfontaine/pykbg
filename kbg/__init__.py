@@ -3,7 +3,7 @@
 import json
 import requests
 
-__version__ = "0.0.2"
+__version__ = "0.0.3"
 
 API_ENDPOINT = "https://courses-api.kelbongoo.com"
 
