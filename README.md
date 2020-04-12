@@ -97,6 +97,14 @@ Note this method is cached; use `force=True` to force the API call.
 Equivalent of `get_store_offer` that returns lookup `dict`s rather than lists
 of items.
 
+#### `get_store_status(store_id)`
+Return a `dict` describing a store’s status.
+
+* `is_active` (`bool`): is the store active, i.e. are we in the timeframe for
+    orders?
+* `is_full` (`bool`): is the store full, i.e. it can’t take anymore orders?
+* `full_tags` (`str` `list`): what is full? Possible values: `"ORDERS"`, `"SEC"`, `"FRAIS"`
+
 ### Examples
 Create a simple connection:
 ```python3

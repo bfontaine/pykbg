@@ -1,5 +1,8 @@
 # PyKbg Changelog
 
+## 0.0.4 (2020/04/12)
+* Add `get_store_status`, thanks to @lcorbasson
+
 ## 0.0.3 (2019/08/19)
 * Rename the obscure `producerproduct_id` key on products to `id`
 * Cache calls to `get_store_offer` by default
