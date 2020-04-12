@@ -368,3 +368,29 @@ class TestKbg(unittest.TestCase):
                     {"id": "p2", "product_name": "product 2", "quantity": 2},
                 ],
             }, order)
+
+    def test_get_store_status(self):
+        with responses.RequestsMock() as resps:
+            closed_tags = ["FRAIS", "ORDERS"]
+            availability = {
+                "available": {},
+                "globalorder": {"status": 2},
+                "globalorderlocales": [{
+                    "_id": "abc",
+                    "id": "abc",
+                    "locale": "BIC",
+                    "closed_tags": closed_tags,
+                    "distributions": [],
+                }],
+            }
+
+            resps.add(
+                responses.GET,
+                k.API_ENDPOINT + "/available?locale=BIC",
+                json=availability)
+
+            self.assertEqual({
+                "is_active": True,
+                "is_full": True,
+                "full_tags": closed_tags,
+            }, self.k.get_store_status("BIC"))
