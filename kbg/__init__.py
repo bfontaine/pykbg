@@ -151,6 +151,34 @@ class UnauthenticatedKbg:
 
         return offer
 
+    def get_store_status(self, store_id):
+        """
+        Return a ``dict`` giving details on the store's status:
+         - is it active? (e.g. we are in the timeframe for orders)
+         - is it full? (e.g. no orders can be taken anymore)
+           - if full, what is full (``"ORDERS"``, ``"SEC"``, ``"FRAIS"``)
+
+        ``store_id`` must be the three-uppercase-letters code of the store. See
+        ``get_stores`` for a list.
+        """
+        resp = self._request_json("/available", params={"locale": store_id})
+        isActive = False
+        if resp["globalorder"]["status"] == 2:
+            isActive = True
+        isFull = False
+        whatIsFull = None
+        stores = resp["globalorderlocales"]
+        for store in stores:
+            if store["locale"] == store_id:
+                whatIsFull = store["closed_tags"]
+                if len(whatIsFull) > 0:
+                    isFull = True
+        return {
+                "isActive": isActive,
+                "isFull": isFull,
+                "whatIsFull": whatIsFull,
+            }
+
 
 class Kbg(UnauthenticatedKbg):
     """
