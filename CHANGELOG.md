@@ -1,5 +1,9 @@
 # PyKbg Changelog
 
+## Unreleased
+* Add `get_store` as a convenient wrapper around `get_stores` + a filter
+* Fix `get_store_status` when a store is inactive
+
 ## 0.0.4 (2020/04/12)
 * Add `get_store_status`, thanks to @lcorbasson
 

@@ -93,6 +93,15 @@ class UnauthenticatedKbg:
         # The website is French-only.
         return self._request_json("/locales")["locales"]
 
+    def get_store(self, store_id):
+        """
+        Return a dict representing a store. See ``get_stores`` to get all of
+        them.
+        """
+        for store in self.get_stores():
+            if store["code"] == store_id:
+                return store
+
     def get_store_availabilities(self, store_id):
         """
         Return a ``dict`` mapping product ids to their availabilities for

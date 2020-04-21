@@ -48,6 +48,18 @@ class TestUnauthenticatedKbg(unittest.TestCase):
             got_stores = self.k.get_stores()
         self.assertSequenceEqual(stores, got_stores)
 
+    def test_get_store(self):
+        store1 = {"code": "ABC", "some": "attr1"}
+        store2 = {"code": "DEF", "some": "attr2"}
+        with responses.RequestsMock() as resps:
+            resps.add(responses.GET, k.API_ENDPOINT + "/locales",
+                    json={"locales": [store1, store2]})
+
+            self.assertEqual(store1, self.k.get_store("ABC"))
+            self.assertEqual(store2, self.k.get_store("DEF"))
+            self.assertIsNone(self.k.get_store("GHI"))
+
+
     def test_get_store_availabilities(self):
         store = "XYZ"
         availabilities = {"id1": 1, "id2": 3, "id3": 2000, "id4": 0}

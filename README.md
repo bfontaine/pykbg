@@ -83,6 +83,9 @@ The `UnauthenticatedKbg` constructor doesn’t take any argument.
 #### `get_stores()`
 Get the list of stores (`list` of `dict`s).
 
+#### `get_store(store_id)`
+Get a single store (`dict`).
+
 #### `get_store_availabilities(store_id)`
 Get product availabilities at the given store for the current command window,
 as a map of product ids to units count.
