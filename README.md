@@ -200,13 +200,13 @@ if len(known_beers) != len(beers):
 This library uses undocumented API endpoints, so it may break at any time.
 
 ## Notes
-Don’t confuse KBG (Kelbongoo) with [KGB](https://en.wikipedia.org/wiki/KGB).
+Don’t confuse KBG (Kelbongoo) with the [KGB](https://en.wikipedia.org/wiki/KGB).
 
 The Kelbongoo API refers to stores as “locales”, using the first tree letters
 in upper-case as a primary key: `BOR` is Borrégo and `BIC` is Bichat, for
 example.
 
-Prices are given in €uro cents; you need to divide them by 100 to get the
-price in €uro: `"consumer_price": 221` means it’s something that costs €2.21.
+Prices are given in euro cents; you need to divide them by 100 to get the
+price in euro: `"consumer_price": 221` means it’s something that costs €2.21.
 
 Please throttle your requests to respect Kelbongoo’s servers.
