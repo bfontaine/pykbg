@@ -394,3 +394,14 @@ class TestKbg(unittest.TestCase):
                 "is_full": True,
                 "full_tags": closed_tags,
             }, self.k.get_store_status("BIC"))
+
+            resps.add(
+                responses.GET,
+                k.API_ENDPOINT + "/available?locale=DEF",
+                json={"message": "globalorder-not-found"})
+
+            self.assertEqual({
+                "is_active": False,
+                "is_full": False,
+                "full_tags": [],
+            }, self.k.get_store_status("DEF"))

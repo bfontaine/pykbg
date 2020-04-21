@@ -165,8 +165,8 @@ class UnauthenticatedKbg:
         ``get_stores`` for a list.
         """
         resp = self._request_json("/available", params={"locale": store_id})
-        is_active = resp["globalorder"]["status"] == 2
-        stores = resp["globalorderlocales"]
+        is_active = resp.get("globalorder", {}).get("status") == 2
+        stores = resp.get("globalorderlocales", [])
 
         closed_tags = []
         for store in stores:
